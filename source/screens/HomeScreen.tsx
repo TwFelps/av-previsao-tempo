@@ -8,11 +8,23 @@ import { RootStackParamList } from '../navigation';
 export default function HomeScreen() {
 
   const [cidade, setCidade] = useState('');
-  const [clima, setClima] =useState(null);
+  const [clima, setClima] =useState<any>(null);
   const [carregando, setCarregando] =useState(false);
   const [erro, setErro] =useState('');
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  let ehDia = false;
+
+  if(clima) {
+    const horarioAtual = new Date(clima.dt * 1000);
+    const horarioNascerDoSol = new Date(clima.sys.sunrise * 1000);
+    const horarioPorDoSol = new Date(clima.sys.sunset * 1000);
+
+    ehDia = horarioAtual >= horarioNascerDoSol && horarioAtual < horarioPorDoSol;
+  }
+
+
 
   const buscarClima = async () => {
     if (!cidade) return;
@@ -70,6 +82,51 @@ export default function HomeScreen() {
 
       {clima && (
         <View style={styles.weatherContainer}>
+          <Image 
+            source={
+              clima.weather[0].description.includes('céu limpo') 
+                ? (ehDia 
+                    ? require('../../assets/icons/CEU-LIMPO-DIA.png') : require('../../assets/icons/CEU-LIMPO-NOITE.png'))
+                    :
+              clima.weather[0].description.includes('algumas nuvens')
+                ? (ehDia
+                    ? require('../../assets/icons/POUCAS-NUVENS-DIA.png') : require('../../assets/icons/POUCAS-NUVENS-NOITE.png'))
+                    :
+              clima.weather[0].description.includes('nuvens dispersas')
+                ? (ehDia
+                    ? require('../../assets/icons/NUVENS-DISPERSAS-DIA.png') : require('../../assets/icons/NUVENS-DISPERSAS-NOITE.png'))
+                    :
+              clima.weather[0].description.includes('nuvens quebradas')
+                ? (ehDia
+                    ? require('../../assets/icons/PARCIAL-NUBLADO-DIA.png') : require('../../assets/icons/PARCIAL-NUBLADO-NOITE.png'))
+                    :
+              clima.weather[0].description.includes('nublado')
+                ? (ehDia
+                    ? require('../../assets/icons/NUBLADO.png') : require('../../assets/icons/NUBLADO.png'))
+                    :
+              clima.weather[0].description.includes('chuva leve')
+                ? (ehDia
+                    ? require('../../assets/icons/CHUVA-DIA.png') : require('../../assets/icons/CHUVA-NOITE.png'))
+                    :
+              clima.weather[0].description.includes('chuva')
+                ? (ehDia
+                    ? require('../../assets/icons/PANCADA-CHUVA.png') : require('../../assets/icons/PANCADA-CHUVA.png'))
+                    :
+              clima.weather[0].description.includes('trovoada')
+                ? (ehDia
+                    ? require('../../assets/icons/TEMPESTADE.png') : require('../../assets/icons/TEMPESTADE.png'))
+                    :
+              clima.weather[0].description.includes('neve')
+                ? (ehDia
+                    ? require('../../assets/icons/NEVE.png') : require('../../assets/icons/NEVE.png'))
+                    :
+              clima.weather[0].description.includes('nevoeiro')
+                ? (ehDia
+                    ? require('../../assets/icons/NEVOA.png') : require('../../assets/icons/NEVOA.png'))
+                    : require('../../assets/icons/UNKNOWN.png')
+            }
+            style={styles.weatherImage}
+          />            
             <Text style={styles.cityText}>{clima.name} {clima.main.temp}°C</Text>
             <Text style={styles.weatherText}>Clima: {clima.weather[0].description}</Text>
             <Text style={styles.weatherText}>Mínima: {clima.main.temp_min}°C</Text>
@@ -146,8 +203,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   weatherImage: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
     resizeMode: 'contain',
     marginBottom: 15,
   },
