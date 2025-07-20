@@ -1,5 +1,5 @@
 // source/screens/Home.jsx
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 
 export default function HomeScreen() {
@@ -57,18 +57,29 @@ export default function HomeScreen() {
         <Text style={styles.buttonText}>Buscar</Text>
       </TouchableOpacity>
 
-      {carregando && <text style={{ textAlign: 'center', marginTop: 10}}>Carregando...</text>}
+      {carregando && <Text style={{ textAlign: 'center', marginTop: 10 }}>Carregando...</Text>}
 
       {erro != '' && <Text style={{ textAlign: 'center', color: 'red', marginTop: 10}}>{erro}</Text>}
 
+      
+
       {clima && (
-        <View style={styles.resultado}>
-          <Text style={styles.city}>{clima.name} {clima.main.temp}°C</Text>
-          <Text>{clima.weather[0].description}</Text>
-          <Text>Mín: {clima.main.temp_min}°C </Text>
-          <Text>Máx: {clima.main.temp_max}°C</Text>
-        </View>
-      )}
+        <View style={styles.weatherContainer}>
+            <Text style={styles.cityText}>{clima.name} {clima.main.temp}°C</Text>
+            <Text style={styles.weatherText}>Clima: {clima.weather[0].description}</Text>
+            <Text style={styles.weatherText}>Mínima: {clima.main.temp_min}°C</Text>
+            <Text style={styles.weatherText}>Máxima: {clima.main.temp_max}°C</Text>
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity style={styles.detailButton}>
+                <Text style={styles.detailButtonText}>Mais detalhes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.shareButton}>
+                <Text style={styles.detailButtonText}>Compartilhar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )
+      }
 
     </View>
   );
@@ -108,5 +119,50 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
   },
+  weatherContainer: {
+    backgroundColor: '#E3F2FD',
+    padding: 20,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  weatherImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+    marginBottom: 15,
+  },
+  cityText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  weatherText: {
+    fontSize: 18,
+    color: '#555',
+    marginBottom: 5,
+  },
+   buttonsContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+   detailButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    marginHorizontal: 5,
+  },
+  shareButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    marginHorizontal: 5,
+  },
+  detailButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
-
