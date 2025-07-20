@@ -1,6 +1,9 @@
 // source/screens/Home.jsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation';
 
 export default function HomeScreen() {
 
@@ -8,6 +11,8 @@ export default function HomeScreen() {
   const [clima, setClima] =useState(null);
   const [carregando, setCarregando] =useState(false);
   const [erro, setErro] =useState('');
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const buscarClima = async () => {
     if (!cidade) return;
@@ -70,9 +75,20 @@ export default function HomeScreen() {
             <Text style={styles.weatherText}>Mínima: {clima.main.temp_min}°C</Text>
             <Text style={styles.weatherText}>Máxima: {clima.main.temp_max}°C</Text>
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.detailButton}>
+              
+              <TouchableOpacity 
+                style={styles.detailButton}
+                onPress={() => {
+                  navigation.navigate('Details', {
+                    feelsLike: clima.main.feels_like,
+                    humidity: clima.main.humidity,
+                    windSpeed: clima.wind.speed
+                  });
+                }}
+                >
                 <Text style={styles.detailButtonText}>Mais detalhes</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.shareButton}>
                 <Text style={styles.detailButtonText}>Compartilhar</Text>
               </TouchableOpacity>
@@ -87,6 +103,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: '#6dbcff',
     alignItems: 'center',
     padding: 20,
   },
@@ -97,6 +115,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
+    backgroundColor: 'white',
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
@@ -120,7 +139,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   weatherContainer: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#c6e0f7',
     padding: 20,
     borderRadius: 15,
     alignItems: 'center',
