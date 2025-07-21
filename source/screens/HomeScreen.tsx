@@ -4,6 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
+import { getWeatherIcon } from '../utils/getWeatherIcon';
 
 export default function HomeScreen() {
 
@@ -15,6 +16,7 @@ export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   let ehDia = false;
+  let iconSource = null;
 
   if(clima) {
     const horarioAtual = new Date(clima.dt * 1000);
@@ -22,9 +24,9 @@ export default function HomeScreen() {
     const horarioPorDoSol = new Date(clima.sys.sunset * 1000);
 
     ehDia = horarioAtual >= horarioNascerDoSol && horarioAtual < horarioPorDoSol;
+
+    iconSource = getWeatherIcon(clima.weather[0].description, ehDia);
   }
-
-
 
   const buscarClima = async () => {
     if (!cidade) return;
@@ -78,68 +80,31 @@ export default function HomeScreen() {
 
       {erro != '' && <Text style={{ textAlign: 'center', color: 'red', marginTop: 10}}>{erro}</Text>}
 
-      
-
       {clima && (
         <View style={styles.weatherContainer}>
           <Image 
-            source={
-              clima.weather[0].description.includes('céu limpo') 
-                ? (ehDia 
-                    ? require('../../assets/icons/CEU-LIMPO-DIA.png') : require('../../assets/icons/CEU-LIMPO-NOITE.png'))
-                    :
-              clima.weather[0].description.includes('algumas nuvens')
-                ? (ehDia
-                    ? require('../../assets/icons/POUCAS-NUVENS-DIA.png') : require('../../assets/icons/POUCAS-NUVENS-NOITE.png'))
-                    :
-              clima.weather[0].description.includes('nuvens dispersas')
-                ? (ehDia
-                    ? require('../../assets/icons/NUVENS-DISPERSAS-DIA.png') : require('../../assets/icons/NUVENS-DISPERSAS-NOITE.png'))
-                    :
-              clima.weather[0].description.includes('nuvens quebradas')
-                ? (ehDia
-                    ? require('../../assets/icons/PARCIAL-NUBLADO-DIA.png') : require('../../assets/icons/PARCIAL-NUBLADO-NOITE.png'))
-                    :
-              clima.weather[0].description.includes('nublado')
-                ? (ehDia
-                    ? require('../../assets/icons/NUBLADO.png') : require('../../assets/icons/NUBLADO.png'))
-                    :
-              clima.weather[0].description.includes('chuva leve')
-                ? (ehDia
-                    ? require('../../assets/icons/CHUVA-DIA.png') : require('../../assets/icons/CHUVA-NOITE.png'))
-                    :
-              clima.weather[0].description.includes('chuva')
-                ? (ehDia
-                    ? require('../../assets/icons/PANCADA-CHUVA.png') : require('../../assets/icons/PANCADA-CHUVA.png'))
-                    :
-              clima.weather[0].description.includes('trovoada')
-                ? (ehDia
-                    ? require('../../assets/icons/TEMPESTADE.png') : require('../../assets/icons/TEMPESTADE.png'))
-                    :
-              clima.weather[0].description.includes('neve')
-                ? (ehDia
-                    ? require('../../assets/icons/NEVE.png') : require('../../assets/icons/NEVE.png'))
-                    :
-              clima.weather[0].description.includes('nevoeiro')
-                ? (ehDia
-                    ? require('../../assets/icons/NEVOA.png') : require('../../assets/icons/NEVOA.png'))
-                    : require('../../assets/icons/UNKNOWN.png')
-            }
+            source={iconSource}
             style={styles.weatherImage}
           />            
             <Text style={styles.cityText}>{clima.name} {clima.main.temp}°C</Text>
-            <Text style={styles.weatherText}>Clima: {clima.weather[0].description}</Text>
-            <Text style={styles.weatherText}>Mínima: {clima.main.temp_min}°C</Text>
-            <Text style={styles.weatherText}>Máxima: {clima.main.temp_max}°C</Text>
+            <Text style={styles.weatherText}>Clima: {clima.weather[0].description.charAt(0).toUpperCase() + clima.weather[0].description.slice(1).toLowerCase()}</Text>
             <View style={styles.buttonsContainer}>
               
               <TouchableOpacity 
                 style={styles.detailButton}
                 onPress={() => {
                   navigation.navigate('Details', {
+                    name: clima.name,
+                    country: clima.sys.country,
+                    description: clima.weather[0].description,
+                    temp: clima.main.temp,
+                    tempMax: clima.main.temp_max,
+                    tempMin: clima.main.temp_min,
                     feelsLike: clima.main.feels_like,
                     humidity: clima.main.humidity,
-                    windSpeed: clima.wind.speed
+                    windSpeed: clima.wind.speed,
+                    ehDia: ehDia,
+                    iconSource: iconSource,
                   });
                 }}
                 >
