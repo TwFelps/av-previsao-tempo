@@ -1,45 +1,49 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation';
-import { Image } from 'react-native';
-import { getWeatherIcon } from '../utils/getWeatherIcon';
 
-type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
+const screenWidth = Dimensions.get('window').width;
 
-type Props = {
-  route: DetailsScreenRouteProp;
-};
+const DetailsScreen: React.FC<{ route: RouteProp<RootStackParamList, 'Details'> }> = ({ route }) => {
+  const { name, country, description, temp, tempMax, tempMin, feelsLike, humidity, windSpeed, iconSource } = route.params;
 
-  const DetailsScreen: React.FC<Props> = ({ route }) => {
-    const { name, country, description, temp, tempMax, tempMin, feelsLike, humidity, windSpeed, iconSource } = route.params; 
+  const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 
-    return (
+  const infoRow = (label: string, value: string) => (
+    <Text style={styles.info}>
+      <Text style={{ fontWeight: 'bold' }}>{label}</Text> {value}
+    </Text>
+  );
+
+  return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <View style={styles.leftSide}>
-          <Image source={iconSource} style={styles.weatherImage} />
-          <Text style={styles.cityText}>{name}, {country}</Text>
-          <Text style={styles.info}>Temperatura: {temp}ºC</Text>
-        </View>
+        <View style={styles.row}>
+          <View style={styles.leftSide}>
+            <Image source={iconSource} style={styles.weatherImage} />
+            <Text style={styles.cityText}>{name}, {country}</Text>
+            <Text style={styles.info}>Temperatura: {temp}ºC</Text>
+          </View>
 
-      <View style={styles.rightSide}>
-        <Text style={styles.info}>Clima: {description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()}</Text>
-        <Text style={styles.info}>Mínima: {tempMin}ºC</Text>
-        <Text style={styles.info}>Máxima: {tempMax}ºC</Text>
-        <Text style={styles.info}>Sensação Térmica: {feelsLike}ºC</Text>
-        <Text style={styles.info}>Umidade: {humidity}%</Text>
-        <Text style={styles.info}>Velocidade do vento: {windSpeed} m</Text>
+          <View style={styles.rightSide}>
+            {infoRow('Clima:', capitalize(description))}
+            {infoRow('Mínima:', `${tempMin}ºC`)}
+            {infoRow('Máxima:', `${tempMax}ºC`)}
+            {infoRow('Sensação Térmica:', `${feelsLike}ºC`)}
+            {infoRow('Umidade:', `${humidity}%`)}
+            {infoRow('Velocidade do vento:', `${windSpeed} m/s`)}
+          </View>
         </View>
       </View>
     </View>
-);
-}
+  );
+};
 
 export default DetailsScreen;
 
 const styles = StyleSheet.create({
-  container:{ 
+  container: {
     flex: 1,
     backgroundColor: '#6dbcff',
     justifyContent: 'center',
@@ -47,35 +51,40 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   card: {
-    flexDirection: 'row',
     backgroundColor: '#c6e0f7',
     padding: 20,
     borderRadius: 15,
-    alignItems: 'center',
-    alignSelf: 'center',
-    maxWidth: '100%',
-  },  
+    width: '100%',
+    maxWidth: 500,
+  },
+  row: {
+    flexDirection: screenWidth > 500 ? 'row' : 'column',
+    justifyContent: 'space-between',
+    alignItems: screenWidth > 500 ? 'center' : 'flex-start',
+  },
   leftSide: {
     alignItems: 'center',
-    marginRight: 20,
+    marginBottom: screenWidth > 500 ? 0 : 20,
+    width: screenWidth > 500 ? '40%' : '100%',
   },
   rightSide: {
-    flex: 1,
-    justifyContent: 'center',
+    width: screenWidth > 500 ? '55%' : '100%',
   },
   weatherImage: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
     resizeMode: 'contain',
-    marginBottom: 15,
+    marginBottom: 10,
   },
-    cityText: {
-    fontSize: 28,
+  cityText: {
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
+    textAlign: 'center',
   },
-  info: { 
-    fontSize: 18, 
-    marginBottom: 5 
+  info: {
+    fontSize: 18,
+    marginBottom: 5,
+    color: '#444',
   },
 });

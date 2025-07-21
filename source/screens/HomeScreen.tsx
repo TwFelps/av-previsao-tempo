@@ -1,6 +1,6 @@
 // source/screens/Home.jsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Share, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
@@ -35,6 +35,8 @@ export default function HomeScreen() {
     setErro('');
     setClima(null);
 
+     Keyboard.dismiss();
+
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${cidade}&appid=53a04a900e63f4f0660469117a3749ef&lang=pt_br&units=metric`
@@ -48,6 +50,20 @@ export default function HomeScreen() {
       setErro('Cidade não encontrada.');
     } finally {
       setCarregando(false);
+    }
+  };
+
+  const onShare = async () => {
+    if(!clima) return;
+
+    try {
+      await Share.share({
+        message: `*Tempinho*\n\n📍 *Cidade:* ${clima.name}\n🌡 *Temperatura atual:* ${clima.main.temp}ºC\n🌤 
+        *Clima:* ${clima.weather[0].description.charAt(0).toUpperCase() + clima.weather[0].description.slice(1).toLowerCase()}`
+
+      });
+    } catch (error) {
+      console.log('Erro ao compartilhar:', error)
     }
   };
 
@@ -111,7 +127,7 @@ export default function HomeScreen() {
                 <Text style={styles.detailButtonText}>Mais detalhes</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.shareButton}>
+              <TouchableOpacity style={styles.shareButton} onPress={onShare}>
                 <Text style={styles.detailButtonText}>Compartilhar</Text>
               </TouchableOpacity>
             </View>
